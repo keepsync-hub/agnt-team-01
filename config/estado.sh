@@ -3,7 +3,9 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
-ult() { ls -1t "$1"/*.md 2>/dev/null | grep -v '/\.' | head -1; }
+# El "último" artefacto sale del nombre (prefijo de fecha, y sufijo de revisión
+# cuando lo hay), no de la mtime: tras un clon todos los archivos comparten mtime.
+ult() { ls -1 "$1"/*.md 2>/dev/null | grep -v '/\.' | sort -V | tail -1; }
 
 echo "=== ETAPAS ==="
 printf '%-16s %-46s %s\n' "ETAPA" "ÚLTIMO ARTEFACTO" "TOTAL"
@@ -19,20 +21,28 @@ pend=0
 for f in workspace/03-borradores/*.md; do
   [ -e "$f" ] || { echo "(ninguno)"; break; }
   slug=$(basename "$f" .md)
-  # puede haber varias revisiones del mismo borrador: manda la más reciente
-  rev=$(ls -t "workspace/04-revisiones/$slug".revision*.md 2>/dev/null | head -1)
-  nrev=$(ls -1 "workspace/04-revisiones/$slug".revision*.md 2>/dev/null | wc -l | tr -d ' ')
+  # Puede haber varias revisiones del mismo borrador: manda la de número más alto.
+  # No sirve ordenar por fecha de modificación: tras un clon todas comparten mtime.
+  rev=""; nrev=0; maxn=0
+  for r in "workspace/04-revisiones/$slug".revision*.md; do
+    [ -e "$r" ] || continue
+    nrev=$((nrev+1))
+    n=$(basename "$r" .md); n=${n##*.revision}; n=${n#-}   # ".revision-2" -> "2"
+    case "$n" in ''|*[!0-9]*) n=1 ;; esac                  # ".revision" -> 1
+    [ "$n" -ge "$maxn" ] && { maxn=$n; rev=$r; }
+  done
   chars=$(./config/contar.sh "$f" 2>/dev/null | awk '{print $2}')
   if [ -n "$rev" ]; then
     v=$(awk -F': *' '/^veredicto:/{print $2; exit}' "$rev")
-    [ "$nrev" -gt 1 ] && v="$v (rev $nrev)"
   else
     v="SIN REVISAR"; pend=$((pend+1))
   fi
+  # el veredicto crudo manda las pistas de abajo; el sufijo es solo para mostrar
+  etiqueta="$v"; [ "$nrev" -gt 1 ] && etiqueta="$v (rev $maxn)"
   pub="no"; [ -f "workspace/05-publicados/$slug.md" ] && pub="sí"
-  printf '  %-46s %-12s %-22s publicado: %s\n' "$slug" "$chars" "$v" "$pub"
+  printf '  %-46s %-12s %-22s publicado: %s\n' "$slug" "$chars" "$etiqueta" "$pub"
   case "$v" in
-    APROBADO|"APROBADO (rev "*) [ "$pub" = "no" ] && echo "     ↳ listo para publicar, esperando al humano" ;;
+    APROBADO) [ "$pub" = "no" ] && echo "     ↳ listo para publicar, esperando al humano" ;;
     RECHAZADO) echo "     ↳ devolver al redactor" ;;
     "APROBADO CON CAMBIOS") echo "     ↳ hay cambios propuestos sin aplicar" ;;
     "SIN REVISAR") echo "     ↳ falta pasar editor-calidad" ;;

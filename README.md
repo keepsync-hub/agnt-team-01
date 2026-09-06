@@ -4,7 +4,7 @@
 
 ```
 .claude/
-  agents/                     definiciones de los 3 subagentes
+  agents/                     definiciones de los 5 agentes
     coordinador.md
     investigador-claude.md
     estratega-temas.md
