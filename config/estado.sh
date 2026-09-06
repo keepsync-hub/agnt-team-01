@@ -16,7 +16,7 @@ for e in 01-investigacion:investigacion 02-temas:temas 03-borradores:borradores 
 done
 
 echo
-echo "=== BORRADORES ==="
+echo "=== BORRADORES (pendientes) ==="
 pend=0
 for f in workspace/03-borradores/*.md; do
   [ -e "$f" ] || { echo "(ninguno)"; break; }
@@ -39,14 +39,23 @@ for f in workspace/03-borradores/*.md; do
   fi
   # el veredicto crudo manda las pistas de abajo; el sufijo es solo para mostrar
   etiqueta="$v"; [ "$nrev" -gt 1 ] && etiqueta="$v (rev $maxn)"
-  pub="no"; [ -f "workspace/05-publicados/$slug.md" ] && pub="sí"
-  printf '  %-46s %-12s %-22s publicado: %s\n' "$slug" "$chars" "$etiqueta" "$pub"
+  printf '  %-46s %-12s %s\n' "$slug" "$chars" "$etiqueta"
   case "$v" in
-    APROBADO) [ "$pub" = "no" ] && echo "     ↳ listo para publicar, esperando al humano" ;;
+    # publicar es mover: lo que sigue en 03-borradores/ es, por definición, lo pendiente
+    APROBADO) echo "     ↳ listo para publicar, esperando al humano" ;;
     RECHAZADO) echo "     ↳ devolver al redactor" ;;
     "APROBADO CON CAMBIOS") echo "     ↳ hay cambios propuestos sin aplicar" ;;
     "SIN REVISAR") echo "     ↳ falta pasar editor-calidad" ;;
   esac
+done
+
+echo
+echo "=== PUBLICADOS ==="
+for f in workspace/05-publicados/*.md; do
+  [ -e "$f" ] || { echo "(ninguno)"; break; }
+  slug=$(basename "$f" .md)
+  fecha=$(awk -F': *' '/^publicado:/{print $2; exit}' "$f")
+  printf '  %-46s %s\n' "$slug" "${fecha:-sin fecha de publicación}"
 done
 
 echo

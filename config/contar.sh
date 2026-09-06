@@ -4,6 +4,7 @@
 set -euo pipefail
 
 LIMITE="${LIMITE:-1200}"
+LIMITE_GANCHO="${LIMITE_GANCHO:-200}"
 
 # `wc -m` solo cuenta caracteres si el locale es UTF-8; con un locale C —o con uno
 # que no esté instalado en esta máquina— cuenta bytes y cada tilde o ñ vale doble.
@@ -50,7 +51,30 @@ for f in "$@"; do
   gancho=$(printf '%s' "$cuerpo" | head -n 1 | tr -d '\n' | LC_ALL="$LOCALE_UTF8" wc -m | tr -d ' ')
 
   if [ "$n" -le "$LIMITE" ]; then estado="OK"; else estado="EXCEDE por $((n - LIMITE))"; salida=1; fi
-  printf '%-55s %5s/%s caracteres  [%s]  gancho: %s\n' "$f" "$n" "$LIMITE" "$estado" "$gancho"
+
+  # El gancho es lo único que LinkedIn muestra antes del "ver más": pasarse de
+  # LIMITE_GANCHO es bloqueante igual que pasarse del cuerpo, no una nota al pie.
+  if [ "$gancho" -le "$LIMITE_GANCHO" ]; then
+    gestado="gancho: $gancho"
+  else
+    gestado="gancho: $gancho EXCEDE por $((gancho - LIMITE_GANCHO))"
+    salida=1
+  fi
+
+  printf '%-55s %5s/%s caracteres  [%s]  %s\n' "$f" "$n" "$LIMITE" "$estado" "$gestado"
+
+  # Si el archivo declara su propio conteo, se cruza con el medido. Un desajuste
+  # significa que el texto cambió después de medirlo: el número declarado miente.
+  declarado=$(awk '
+    NR == 1 && $0 !~ /^---[[:space:]]*$/ { exit }
+    NR > 1 && /^---[[:space:]]*$/ { exit }
+    NR > 1 && /^caracteres:[[:space:]]*[0-9]+[[:space:]]*$/ {
+      sub(/^caracteres:[[:space:]]*/, ""); sub(/[[:space:]]*$/, ""); print; exit
+    }
+  ' "$f")
+  if [ -n "$declarado" ] && [ "$declarado" != "$n" ]; then
+    echo "aviso: $f declara 'caracteres: $declarado' y mide $n; actualiza el frontmatter" >&2
+  fi
 done
 
 exit $salida

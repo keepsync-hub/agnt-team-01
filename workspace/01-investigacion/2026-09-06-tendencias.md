@@ -1,3 +1,8 @@
+---
+corrida: 001
+fecha: 2026-09-06
+foco: Tendencias generales sobre Claude, sin foco acotado
+---
 # Tendencias Claude — 2026-09-06
 
 > Ventana de análisis: publicaciones de los últimos ~30 días (2026-08-07 → 2026-09-06).

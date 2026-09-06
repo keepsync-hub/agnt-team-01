@@ -6,6 +6,7 @@ alcance: revalidación acotada — aplicación de la única observación menor d
 veredicto: APROBADO
 caracteres: workspace/03-borradores/2026-09-06-cache-reads-coste-agentico.md  1110/1200 caracteres  [OK]  gancho: 153
 fecha_revision: 2026-09-06
+corrida: 002
 ---
 
 ## Alcance y qué se hereda

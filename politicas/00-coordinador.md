@@ -21,6 +21,14 @@
 
 ## Retomar una corrida a medias
 1. `./config/estado.sh` para ver la última etapa con artefacto.
-2. Abrir el detalle de la corrida en `workspace/00-bitacora/corridas/` y leer dónde se cortó.
+2. Abrir el detalle de la corrida en `workspace/00-bitacora/corridas/` y leer dónde se cortó
+   y qué dejó en `## Pendientes`.
 3. Reanudar desde la fase siguiente. No re-ejecutar fases ya completadas salvo que su
    salida esté vacía o el humano lo pida.
+4. Si solo se retoman algunas fases, es una **corrida parcial**: número propio, `alcance:`
+   diciendo qué fases cubre y de qué corrida viene.
+
+## Cerrar pendientes
+Los `## Pendientes` de una corrida no se evaporan solos. En la corrida siguiente, cada uno
+se cierra citando el commit que lo resolvió, o se arrastra diciendo por qué sigue abierto.
+No se editan las corridas viejas: el registro es append-only y se anota hacia adelante.

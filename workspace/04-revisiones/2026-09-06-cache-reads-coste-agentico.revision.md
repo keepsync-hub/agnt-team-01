@@ -3,6 +3,7 @@ borrador: workspace/03-borradores/2026-09-06-cache-reads-coste-agentico.md
 veredicto: APROBADO CON CAMBIOS
 caracteres: workspace/03-borradores/2026-09-06-cache-reads-coste-agentico.md  1092/1200 caracteres  [OK]  gancho: 153
 fecha_revision: 2026-09-06
+corrida: 001
 ---
 
 ## Bloqueantes

@@ -1,6 +1,9 @@
 ---
 tema:
+corrida:
 caracteres:
+gancho:
+brief:
 fuentes:
 estado: borrador
 ---

@@ -1,8 +1,11 @@
 ---
 tema: El recorte del 75% en lecturas de caché de Claude Fable 5.1 y lo que cambia en el coste real de un agente
-caracteres: 1110
+caracteres: 1117
 fuentes: https://www.anthropic.com/claude-fable-and-mythos-5-1 · https://www-cdn.anthropic.com/0339e6a7c5c7b87f5c07798616dc32c215d14235/Claude%20Fable%205.1%20&%20Claude%20Mythos%205.1%20System%20Card.pdf · https://www.vellum.ai/blog/claude-fable-5-1-mythos-5-1-benchmarks-explained
 estado: borrador
+corrida: 002
+gancho: 152
+brief: workspace/02-temas/2026-09-06-agenda.md
 ---
 
 El precio de Claude Fable 5.1 no bajó. Tu factura, si corres agentes, probablemente sí. La diferencia está en una línea del anuncio que casi nadie citó.
