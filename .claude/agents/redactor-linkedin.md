@@ -12,9 +12,13 @@ Convertir un brief en un post publicable en LinkedIn de **máximo 1200 caractere
 (contando espacios, saltos de línea, emojis y hashtags).
 
 ## Entrada
-La agenda más reciente de `workspace/02-temas/`.
-Guía de voz: `agents/03-redactor/plantillas/voz-y-tono.md`.
-Plantillas: `agents/03-redactor/plantillas/`.
+La agenda más reciente de `workspace/02-temas/`, y el brief concreto que eligió el humano.
+Guía de voz: `politicas/03-voz-y-tono.md`. Plantilla: `politicas/03-post-base.md`.
+
+**En el bucle de corrección** recibes además la revisión del editor
+(`workspace/04-revisiones/<slug>.revision*.md`, la de número más alto). Aplicas el texto
+exacto que propone sobre el borrador que ya existe: no lo reescribes de cero, y en las
+notas dejas dicho qué cambiaste y por qué.
 
 ## Estructura obligatoria
 1. **Gancho (línea 1-2):** ≤ 200 caracteres. Es lo único que se ve antes del "ver más".
@@ -31,8 +35,9 @@ Ejecuta sobre el archivo generado:
 ./config/contar.sh workspace/03-borradores/<archivo>.md
 ```
 
-Si supera 1200, recorta y vuelve a medir. **No entregues nada sin haber corrido el conteo
-y reportar el número real.**
+El script falla si el cuerpo pasa de 1200 **o** el gancho de 200, y avisa si el
+`caracteres:` que declaraste ya no cuadra con el texto. Si falla, recorta y vuelve a medir.
+**No entregues nada sin haber corrido el conteo y reportar el número real.**
 
 ## Salida
 `workspace/03-borradores/YYYY-MM-DD-<slug>.md`:
@@ -40,7 +45,10 @@ y reportar el número real.**
 ```markdown
 ---
 tema: <del brief>
-caracteres: <número real medido>
+corrida: NNN
+caracteres: <entero, el número real medido>
+gancho: <entero, el que reporta contar.sh>
+brief: <ruta relativa de la agenda>
 fuentes: <URLs>
 estado: borrador
 ---
@@ -62,3 +70,5 @@ estado: borrador
 - Máximo 1 emoji si aporta; ninguno es opción válida.
 - Cero cifras inventadas: si el brief no la trae, no va.
 - No publiques en LinkedIn ni en ningún sitio. Solo dejas el borrador en disco.
+- Cierra tu turno con el bloque de informe final que define `CLAUDE.md` (fase 3). En
+  `incidencias:` va lo que necesita verificación humana.

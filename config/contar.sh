@@ -4,6 +4,22 @@
 set -euo pipefail
 
 LIMITE="${LIMITE:-1200}"
+LIMITE_GANCHO="${LIMITE_GANCHO:-200}"
+
+# `wc -m` solo cuenta caracteres si el locale es UTF-8; con un locale C —o con uno
+# que no esté instalado en esta máquina— cuenta bytes y cada tilde o ñ vale doble.
+# Por eso no se fija un locale a ciegas: se prueban los candidatos hasta dar con
+# uno que cuente 'ñ' (\303\261) como un solo carácter.
+LOCALE_UTF8=""
+for cand in "${LC_ALL:-}" "${LC_CTYPE:-}" "${LANG:-}" C.UTF-8 C.utf8 en_US.UTF-8 en_US.utf8; do
+  [ -n "$cand" ] || continue
+  if [ "$(printf '\303\261' | LC_ALL="$cand" wc -m 2>/dev/null | tr -d ' ')" = "1" ]; then
+    LOCALE_UTF8="$cand"
+    break
+  fi
+done
+[ -n "$LOCALE_UTF8" ] ||
+  echo "aviso: ningún locale UTF-8 disponible; se contarán bytes y las tildes valdrán doble" >&2
 
 if [ $# -eq 0 ]; then
   echo "uso: $0 <archivo.md> [archivo2.md ...]" >&2
@@ -30,11 +46,35 @@ for f in "$@"; do
   # recorta líneas en blanco al inicio y al final
   cuerpo=$(printf '%s' "$cuerpo" | sed -e '/./,$!d' | awk 'BEGIN{RS="\0"} {sub(/\n+$/,""); print}')
 
-  n=$(printf '%s' "$cuerpo" | LC_ALL=en_US.UTF-8 wc -m | tr -d ' ')
-  gancho=$(printf '%s' "$cuerpo" | head -n 1 | LC_ALL=en_US.UTF-8 wc -m | tr -d ' ')
+  n=$(printf '%s' "$cuerpo" | LC_ALL="$LOCALE_UTF8" wc -m | tr -d ' ')
+  # el salto de línea que emite `head` no se ve en LinkedIn: fuera del conteo
+  gancho=$(printf '%s' "$cuerpo" | head -n 1 | tr -d '\n' | LC_ALL="$LOCALE_UTF8" wc -m | tr -d ' ')
 
   if [ "$n" -le "$LIMITE" ]; then estado="OK"; else estado="EXCEDE por $((n - LIMITE))"; salida=1; fi
-  printf '%-55s %5s/%s caracteres  [%s]  gancho: %s\n' "$f" "$n" "$LIMITE" "$estado" "$gancho"
+
+  # El gancho es lo único que LinkedIn muestra antes del "ver más": pasarse de
+  # LIMITE_GANCHO es bloqueante igual que pasarse del cuerpo, no una nota al pie.
+  if [ "$gancho" -le "$LIMITE_GANCHO" ]; then
+    gestado="gancho: $gancho"
+  else
+    gestado="gancho: $gancho EXCEDE por $((gancho - LIMITE_GANCHO))"
+    salida=1
+  fi
+
+  printf '%-55s %5s/%s caracteres  [%s]  %s\n' "$f" "$n" "$LIMITE" "$estado" "$gestado"
+
+  # Si el archivo declara su propio conteo, se cruza con el medido. Un desajuste
+  # significa que el texto cambió después de medirlo: el número declarado miente.
+  declarado=$(awk '
+    NR == 1 && $0 !~ /^---[[:space:]]*$/ { exit }
+    NR > 1 && /^---[[:space:]]*$/ { exit }
+    NR > 1 && /^caracteres:[[:space:]]*[0-9]+[[:space:]]*$/ {
+      sub(/^caracteres:[[:space:]]*/, ""); sub(/[[:space:]]*$/, ""); print; exit
+    }
+  ' "$f")
+  if [ -n "$declarado" ] && [ "$declarado" != "$n" ]; then
+    echo "aviso: $f declara 'caracteres: $declarado' y mide $n; actualiza el frontmatter" >&2
+  fi
 done
 
 exit $salida

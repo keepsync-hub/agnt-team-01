@@ -5,6 +5,8 @@ Marca cada criterio. Los marcados **[B]** son bloqueantes: uno solo basta para R
 ## Formato
 - [ ] **[B]** Cuerpo ≤ 1200 caracteres, medido con `./config/contar.sh`
 - [ ] **[B]** Gancho ≤ 200 caracteres (es lo único visible antes del "ver más")
+      Los dos anteriores los comprueba el propio script: si sale con error, es bloqueante.
+- [ ] **[B]** El `caracteres:` del frontmatter cuadra con lo medido (`contar.sh` avisa si no)
 - [ ] El gancho se sostiene solo, sin el resto del post
 - [ ] Párrafos de 1-3 líneas, separados por línea en blanco
 - [ ] 3-5 hashtags, en línea aparte
@@ -27,6 +29,7 @@ Marca cada criterio. Los marcados **[B]** son bloqueantes: uno solo basta para R
 
 ## Voz
 - [ ] Sin términos prohibidos: desbloquea, revoluciona, game changer, "en la era de la IA"
+- [ ] Sin emojis decorativos en cada línea y sin listas de 10 puntos
 - [ ] Voz activa, frases cortas
 - [ ] Un solo tema por post
 - [ ] Sin promesas de resultado

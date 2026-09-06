@@ -13,6 +13,7 @@
 |---|---|---|---|---|---|---|---|
 | 001 | 2026-09-06 | Tendencias generales sobre Claude, sin foco acotado (primera ejecución del pipeline) | 1-4 | Recomendación #1 (43.5/45) — el recorte del 75% en lecturas de caché de Claude Fable 5.1 y el coste real de un agente | APROBADO CON CAMBIOS | 1092 | cerrada — pendiente de decisión humana (aplicar cambio y publicar) |
 | 002 | 2026-09-06 | Cierre del borrador de la 001: aplicar la observación menor del editor y revalidar (corrida parcial, continúa la 001) | 3-4 | El mismo de la 001 — cache reads de Claude Fable 5.1 y el coste real de un agente (no se eligió tema nuevo) | APROBADO (rev 2, sin observaciones nuevas) | 1110 | cerrada — aprobado, pendiente solo de la decisión humana de publicar |
+| 003 | 2026-09-06 | Revisión estructural del repo y optimización como equipo coordinado de agentes (corrida de mantenimiento: ninguna fase editorial) | — | Ninguno: no se produjo contenido | — | — | cerrada — cierra el pendiente técnico de la 002 sobre `ult()`; el borrador sigue aprobado y sin publicar |
 
 ---
 

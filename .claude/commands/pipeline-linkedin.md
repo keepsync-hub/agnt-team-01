@@ -1,11 +1,15 @@
 ---
 description: Ejecuta el pipeline completo investigación → tema → post → edición
 argument-hint: [foco opcional, ej. "Claude Code" o "agentes"]
-allowed-tools: Task, Read, Write, Bash
+allowed-tools: Agent, Read, Write, Bash
 ---
 
 Delega en el subagente `coordinador`: que ejecute las cuatro fases **en orden**, esperando el resultado de cada una antes de lanzar la siguiente.
 Foco de esta ronda: $ARGUMENTS (si está vacío, cubre tendencias generales sobre Claude).
+
+Cada fase termina devolviendo el bloque de informe final que define `CLAUDE.md`; si una
+vuelve sin él, pídeselo antes de seguir. El coordinador abre además el artefacto para
+comprobar que trae lo que promete: existir no es estar bien.
 
 1. Lanza el subagente `investigador-claude`. Debe dejar su informe en `workspace/01-investigacion/`.
 2. Con ese informe, lanza `estratega-temas`. Debe dejar la agenda en `workspace/02-temas/`.
@@ -18,7 +22,9 @@ Foco de esta ronda: $ARGUMENTS (si está vacío, cubre tendencias generales sobr
      párate y explícame por qué el tema no se sostiene.
    - `APROBADO CON CAMBIOS` → muéstrame los cambios propuestos y pregúntame si los aplico.
    - `APROBADO` → sigue.
-7. Corre `./config/contar.sh` sobre el borrador final y reporta el número real de caracteres.
+7. Corre `./config/contar.sh` sobre el borrador final y reporta el número real de caracteres
+   y del gancho. Si el script sale con error o avisa de un `caracteres:` desajustado, eso
+   vuelve al redactor: no es una nota al pie.
 8. Asegúrate de que el coordinador ha cerrado la corrida en `workspace/00-bitacora/`.
 9. Entrégame el post en el chat, listo para copiar, junto al veredicto del editor.
-   **No lo publiques en ningún sitio.**
+   **No lo publiques en ningún sitio**, ni lo muevas a publicados: eso lo decido yo.
